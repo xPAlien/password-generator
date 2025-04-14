@@ -2,7 +2,7 @@
 
 A modern, sleek password generator application with a dark mode UI that allows users to create strong, random passwords with customizable options.
 
-![Password Generator Screenshot](https://i.imgur.com/YourScreenshotHere.png)
+![Password Generator Screenshot](https://imgur.com/a/cPA0szj)
 
 ## 📋 Features
 
