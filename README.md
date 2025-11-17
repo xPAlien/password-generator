@@ -1,10 +1,25 @@
 # Secure Password Generator
 
-A modern, feature-rich password and passphrase generator with an elegant UI, offering both traditional random passwords and memorable word-based passphrases with extensive customization options.
+A stunning, feature-rich password and passphrase generator with a **futuristic glassmorphic UI**, offering both traditional random passwords and memorable word-based passphrases with extensive customization options.
 
 ![Password Generator Screenshot](https://i.imgur.com/m7MP7Em.png)
 
+> **Note:** The screenshot above shows the previous design. The app now features a beautiful glassmorphic, futuristic UI with animated gradients, glowing effects, and smooth animations!
+
 ## ✨ Features
+
+### 🎨 Glassmorphic Futuristic UI
+- **Animated gradient backgrounds** with smooth color transitions (dark & light themes)
+- **Frosted glass effect** with backdrop blur on all interactive elements
+- **Neon glow effects** with purple and pink accent colors
+- **Floating animations** for container and UI elements
+- **Shimmer effects** on hover for buttons and controls
+- **Gradient borders** with animated glow on focus
+- **Smooth transitions** throughout the entire interface
+- **Custom glowing scrollbars** with gradient styling
+- **Interactive hover states** with scale, lift, and glow effects
+- **Strength indicators** with gradient fills and glowing bars
+- **Professional depth** with multiple shadow layers and transparency
 
 ### 🔐 Dual Generation Modes
 - **Password Mode**: Generate strong random passwords with custom character sets
@@ -82,8 +97,14 @@ Or visit the custom domain: [https://pw.b3nx.com](https://pw.b3nx.com)
 
 This project is built with pure web technologies - no frameworks or build tools required:
 
-- **HTML5** - Semantic markup
-- **CSS3** - Modern styling with CSS variables, flexbox, and grid
+- **HTML5** - Semantic markup with ARIA accessibility
+- **CSS3** - Advanced styling with:
+  - CSS variables for theming
+  - Backdrop-filter for glassmorphic effects
+  - CSS animations (gradientShift, float, glow, shimmer)
+  - Linear gradients for modern aesthetic
+  - Flexbox and Grid for responsive layouts
+  - Custom scrollbar styling
 - **Vanilla JavaScript** - No dependencies, just pure JS
 - **Web Crypto API** - Cryptographically secure random generation
 - **Local Storage API** - Theme and history persistence
@@ -184,7 +205,20 @@ This project is [MIT](LICENSE) licensed.
 
 ## 🎉 Changelog
 
-### Version 2.0 (Latest)
+### Version 2.1 (Latest) - Glassmorphic UI
+- ✨ **Complete UI redesign** with glassmorphic futuristic aesthetic
+- 🎨 Animated gradient backgrounds with 15s color-shifting animations
+- ✨ Frosted glass effect with backdrop-filter blur on all elements
+- 💫 Neon glow effects with purple (#8b5cf6) and pink (#ec4899) accents
+- 🌊 Floating animations for container and overlay elements
+- ⚡ Shimmer effects on button hover interactions
+- 🔮 Gradient borders with animated glow effects
+- 🎯 Enhanced strength indicators with gradient fills and glow
+- 📜 Custom gradient scrollbars with glow effects
+- 🎭 Professional depth with multi-layer shadows and transparency
+- 🌈 Smooth hover states with scale, lift, and glow transformations
+
+### Version 2.0
 - ✅ Added passphrase generation mode with 850+ word dictionary
 - ✅ Added password strength indicator with visual feedback
 - ✅ Added light/dark theme toggle with persistence
@@ -216,7 +250,8 @@ This project is [MIT](LICENSE) licensed.
 
 - Inspired by best practices in password security
 - Word list curated from common English words for memorability
-- UI design influenced by modern design principles
+- UI design inspired by glassmorphism and futuristic aesthetics
+- Animations and effects designed for smooth, modern user experience
 - Built with ❤️ for the security-conscious community
 
 ---
