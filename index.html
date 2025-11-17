@@ -76,15 +76,15 @@
       -moz-osx-font-smoothing: grayscale;
       background: linear-gradient(-45deg, #0a0118, #1a0b2e, #16213e, #0f0f23);
       background-size: 400% 400%;
+      background-attachment: fixed;
       animation: gradientShift 15s ease infinite;
       color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 32px 16px;
       position: relative;
-      overflow: hidden;
     }
 
     [data-theme="light"] body {
@@ -120,7 +120,7 @@
         0 0 60px rgba(139, 92, 246, 0.2);
       position: relative;
       transition: all 0.5s ease;
-      animation: float 6s ease-in-out infinite;
+      margin: auto;
     }
 
     .container::before {
@@ -826,8 +826,15 @@
     }
 
     @media (max-width: 480px) {
+      body {
+        padding: 16px;
+        align-items: flex-start;
+      }
+
       .container {
         padding: 24px;
+        margin-top: 0;
+        margin-bottom: 0;
       }
 
       h1 {
