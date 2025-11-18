@@ -884,6 +884,123 @@
     .history-list::-webkit-scrollbar-thumb:hover {
       box-shadow: 0 0 8px var(--glow-primary);
     }
+
+    /* Toast Notifications */
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--bg-secondary);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 18px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 250px;
+      animation: slideIn 0.3s ease-out;
+      pointer-events: auto;
+    }
+
+    .toast.hiding {
+      animation: slideOut 0.3s ease-out;
+    }
+
+    .toast-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .toast.success .toast-icon {
+      color: #5a9876;
+    }
+
+    .toast.info .toast-icon {
+      color: var(--accent-primary);
+    }
+
+    .toast-message {
+      flex: 1;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* Show/Hide Password */
+    .password-text.hidden {
+      filter: blur(6px);
+      user-select: none;
+    }
+
+    .visibility-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      padding: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 8px;
+      margin-left: 4px;
+    }
+
+    .visibility-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+    }
+
+    .visibility-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    @media (max-width: 480px) {
+      .toast-container {
+        top: 16px;
+        right: 16px;
+        left: 16px;
+      }
+
+      .toast {
+        min-width: unset;
+      }
+    }
   </style>
 </head>
 <body>
@@ -969,6 +1086,13 @@
           disabled
           aria-label="Custom character input"
         >
+      </div>
+
+      <div class="checkbox-grid">
+        <div class="checkbox-item">
+          <input type="checkbox" id="exclude-ambiguous" aria-label="Exclude ambiguous characters">
+          <label for="exclude-ambiguous">Exclude Similar (0/O, 1/l/I)</label>
+        </div>
       </div>
     </div>
 
@@ -1222,6 +1346,118 @@
     });
 
     // ============================================================================
+    // TOAST NOTIFICATIONS
+    // ============================================================================
+    function showToast(message, type = 'success') {
+      const toastContainer = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+
+      const icon = type === 'success'
+        ? '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+
+      toast.innerHTML = `
+        <span style="color: var(--accent-primary);">${icon}</span>
+        <span style="color: var(--text-primary); font-size: 14px;">${message}</span>
+      `;
+
+      toastContainer.appendChild(toast);
+
+      // Auto remove after 3 seconds
+      setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => {
+          toastContainer.removeChild(toast);
+        }, 300);
+      }, 3000);
+    }
+
+    // ============================================================================
+    // PREFERENCES MANAGEMENT
+    // ============================================================================
+    function savePreferences() {
+      const preferences = {
+        passwordLength: lengthSlider.value,
+        wordCount: wordCountSlider.value,
+        lowercase: lowercaseCheckbox.checked,
+        uppercase: uppercaseCheckbox.checked,
+        numbers: numbersCheckbox.checked,
+        symbols: symbolsCheckbox.checked,
+        excludeAmbiguous: document.getElementById('exclude-ambiguous').checked,
+        customChars: customCheckbox.checked,
+        capitalize: document.getElementById('capitalize').checked,
+        includeNumbers: document.getElementById('include-numbers').checked,
+        separator: document.getElementById('separator').value,
+        mode: currentMode
+      };
+
+      localStorage.setItem('userPreferences', JSON.stringify(preferences));
+    }
+
+    function loadPreferences() {
+      const saved = localStorage.getItem('userPreferences');
+      if (!saved) return;
+
+      try {
+        const prefs = JSON.parse(saved);
+
+        // Password mode preferences
+        if (prefs.passwordLength) {
+          lengthSlider.value = prefs.passwordLength;
+          lengthValue.textContent = prefs.passwordLength;
+        }
+
+        if (prefs.lowercase !== undefined) lowercaseCheckbox.checked = prefs.lowercase;
+        if (prefs.uppercase !== undefined) uppercaseCheckbox.checked = prefs.uppercase;
+        if (prefs.numbers !== undefined) numbersCheckbox.checked = prefs.numbers;
+        if (prefs.symbols !== undefined) symbolsCheckbox.checked = prefs.symbols;
+        if (prefs.excludeAmbiguous !== undefined) {
+          document.getElementById('exclude-ambiguous').checked = prefs.excludeAmbiguous;
+        }
+        if (prefs.customChars !== undefined) customCheckbox.checked = prefs.customChars;
+
+        // Passphrase mode preferences
+        if (prefs.wordCount) {
+          wordCountSlider.value = prefs.wordCount;
+          wordCountValue.textContent = prefs.wordCount;
+        }
+
+        if (prefs.capitalize !== undefined) {
+          document.getElementById('capitalize').checked = prefs.capitalize;
+        }
+        if (prefs.includeNumbers !== undefined) {
+          document.getElementById('include-numbers').checked = prefs.includeNumbers;
+        }
+        if (prefs.separator) {
+          document.getElementById('separator').value = prefs.separator;
+        }
+
+        // Mode preference
+        if (prefs.mode) {
+          currentMode = prefs.mode;
+          modeBtns.forEach(btn => {
+            if (btn.dataset.mode === prefs.mode) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          });
+
+          if (prefs.mode === 'password') {
+            passwordMode.classList.add('active');
+            passphraseMode.classList.remove('active');
+          } else {
+            passwordMode.classList.remove('active');
+            passphraseMode.classList.add('active');
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load preferences:', e);
+      }
+    }
+
+    // ============================================================================
     // MODE SWITCHING
     // ============================================================================
     modeBtns.forEach(btn => {
@@ -1242,7 +1478,8 @@
           passphraseMode.classList.add('active');
         }
 
-        // Regenerate with new mode
+        // Save preference and regenerate
+        savePreferences();
         generatePasswords();
       });
     });
@@ -1252,10 +1489,12 @@
     // ============================================================================
     lengthSlider.addEventListener('input', () => {
       lengthValue.textContent = lengthSlider.value;
+      savePreferences();
     });
 
     wordCountSlider.addEventListener('input', () => {
       wordCountValue.textContent = wordCountSlider.value;
+      savePreferences();
     });
 
     // ============================================================================
@@ -1269,7 +1508,22 @@
       uppercaseCheckbox.disabled = isCustomEnabled;
       numbersCheckbox.disabled = isCustomEnabled;
       symbolsCheckbox.disabled = isCustomEnabled;
+
+      savePreferences();
     });
+
+    // ============================================================================
+    // SAVE PREFERENCES ON CHANGES
+    // ============================================================================
+    // Add event listeners to all inputs that should save preferences
+    [lowercaseCheckbox, uppercaseCheckbox, numbersCheckbox, symbolsCheckbox].forEach(checkbox => {
+      checkbox.addEventListener('change', savePreferences);
+    });
+
+    document.getElementById('exclude-ambiguous')?.addEventListener('change', savePreferences);
+    document.getElementById('capitalize')?.addEventListener('change', savePreferences);
+    document.getElementById('include-numbers')?.addEventListener('change', savePreferences);
+    document.getElementById('separator')?.addEventListener('input', savePreferences);
 
     // ============================================================================
     // PASSWORD STRENGTH CALCULATOR
@@ -1302,16 +1556,29 @@
       const length = parseInt(lengthSlider.value);
       const useCustom = customCheckbox.checked;
       const customChars = customCharsInput.value;
+      const excludeAmbiguous = document.getElementById('exclude-ambiguous').checked;
 
       let charset = '';
 
       if (useCustom && customChars) {
         charset = customChars;
       } else {
-        if (lowercaseCheckbox.checked) charset += 'abcdefghijklmnopqrstuvwxyz';
-        if (uppercaseCheckbox.checked) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        if (numbersCheckbox.checked) charset += '0123456789';
-        if (symbolsCheckbox.checked) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+        let lowercase = 'abcdefghijklmnopqrstuvwxyz';
+        let uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let numbers = '0123456789';
+        let symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+        // Exclude ambiguous characters if option is checked
+        if (excludeAmbiguous) {
+          lowercase = lowercase.replace(/[lo]/g, ''); // remove l, o
+          uppercase = uppercase.replace(/[IO]/g, ''); // remove I, O
+          numbers = numbers.replace(/[01]/g, ''); // remove 0, 1
+        }
+
+        if (lowercaseCheckbox.checked) charset += lowercase;
+        if (uppercaseCheckbox.checked) charset += uppercase;
+        if (numbersCheckbox.checked) charset += numbers;
+        if (symbolsCheckbox.checked) charset += symbols;
       }
 
       if (charset === '') return '';
@@ -1404,6 +1671,35 @@
         passwordText.className = 'password-text';
         passwordText.textContent = password;
 
+        // Visibility toggle button
+        const visibilityBtn = document.createElement('button');
+        visibilityBtn.className = 'visibility-btn';
+        visibilityBtn.setAttribute('aria-label', 'Toggle password visibility');
+        visibilityBtn.innerHTML = `
+          <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          <svg class="eye-off-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          </svg>
+        `;
+
+        visibilityBtn.addEventListener('click', () => {
+          const isHidden = passwordText.classList.toggle('hidden');
+          const eyeIcon = visibilityBtn.querySelector('.eye-icon');
+          const eyeOffIcon = visibilityBtn.querySelector('.eye-off-icon');
+
+          if (isHidden) {
+            eyeIcon.style.display = 'none';
+            eyeOffIcon.style.display = 'block';
+          } else {
+            eyeIcon.style.display = 'block';
+            eyeOffIcon.style.display = 'none';
+          }
+        });
+
         const copyBtn = document.createElement('button');
         copyBtn.className = 'copy-btn';
         copyBtn.setAttribute('aria-label', 'Copy password');
@@ -1417,6 +1713,7 @@
         copyBtn.addEventListener('click', () => copyToClipboard(password, copyBtn));
 
         passwordContent.appendChild(passwordText);
+        passwordContent.appendChild(visibilityBtn);
         passwordContent.appendChild(copyBtn);
 
         passwordItem.appendChild(passwordHeader);
@@ -1442,12 +1739,16 @@
         `;
         btn.classList.add('copied');
 
+        // Show toast notification
+        showToast('Password copied to clipboard!', 'success');
+
         setTimeout(() => {
           btn.innerHTML = originalHTML;
           btn.classList.remove('copied');
         }, 2000);
       }).catch(err => {
         console.error('Failed to copy:', err);
+        showToast('Failed to copy password', 'error');
       });
     }
 
@@ -1465,9 +1766,15 @@
           Copied!
         `;
 
+        // Show toast notification
+        showToast(`Copied ${currentPasswords.length} passwords!`, 'success');
+
         setTimeout(() => {
           copyAllBtn.innerHTML = originalText;
         }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+        showToast('Failed to copy passwords', 'error');
       });
     });
 
@@ -1586,7 +1893,11 @@
     // ============================================================================
     initTheme();
     updateHistoryUI();
+    loadPreferences();
     generatePasswords();
   </script>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
 </body>
 </html>
